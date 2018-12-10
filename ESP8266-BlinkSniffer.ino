@@ -58,38 +58,24 @@ void setup() {
 
 /* 
  *  In the loop(), we blink the LED (on for 10 milliseconds) each time we
- *  detect 5 datagrams.
+ *  detect (at least) 5 more datagrams.
  *  
- *  Note 1 - The % is the modulo operator. This returns the remainder after
- *  dividing the integer gCallbackCount by 5.  If you are not familiar with
- *  the modulo operator, you can read more about it here:
- *  
- *  https://en.wikipedia.org/wiki/Modulo_operation
- *  
- *  The modulo operator is super useful when you want to perform an action
- *  for every N times some event occurs.  In this case, action = blink LED
- *  for every 5 datagrams we detect.
- *  
- *  Note 2 - You know how I *just* said this will blink the LED once for every
- *  5 datagrams we detect...well... that isn't exactly true.  Can you guess
- *  why this might be?
- *  
- *  Problem 1 - What would happen if 100 datagrams were detected between calls
- *  to the loop() function?  How many times should the LED blink if it blinks
- *  once for every 5 datagrams?  How many times would it really blink?
- *  
- *  Problem 2 - What would happen if no datagrams are ever detected?  Would
- *  the LED blink?  Why?
- *  
- *  I will fix this in future Sketches, but for now I like the way this looks
- *  and it keeps the Sketch simple.
+ *  Note - a static variable within a function will retain its value between
+ *  function calls.  Here we use prevCallbackCount to "remember" what the 
+ *  callback count was the last time the LED was blinked.
  */
  
 void loop() {
-  if ((gCallbackCount % 5) == 0) {
+  static long prevCallbackCount = 0;
+
+  long packetsDetected = gCallbackCount - prevCallbackCount;
+  
+  if (packetsDetected >= 5) {
     digitalWrite(LED_BUILTIN, LED_ON);
     delay(10);  // delay in microseconds
     digitalWrite(LED_BUILTIN, LED_OFF);
+
+    prevCallbackCount = gCallbackCount;
   }
 }
 
